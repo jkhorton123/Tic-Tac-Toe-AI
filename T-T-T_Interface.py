@@ -1,5 +1,3 @@
-import numpy as np
-
 
 class Board():
     def __init__(self):
@@ -29,19 +27,24 @@ class Board():
         [({6}),({7}),({8})]
         """.format(*self.boardArr))
 
-    def updateBoard(self, Tloc, Tlet):
+    def updateBoard(self, Tlet):
         """
         Updates the T-T-T board and displays it in the terminal
 
         Parameters 
         ----------
-        Tloc = int
-            Location of X or O on the board
         Tlet = str
             X or O that will be placed on the board
         """
-        self.boardArr[Tloc] = Tlet
-        self.printBoard()
+        locAccepted = False
+        while not locAccepted:
+            loc = input("Enter a location number: ")
+            if loc.isdigit():
+                if int(loc) in range(9):
+                    if str(self.boardArr[int(loc)]).isdigit():
+                        self.boardArr[int(loc)] = Tlet
+                        self.printBoard()
+                        locAccepted = True
 
 
 def getUserLetter():
@@ -49,16 +52,20 @@ def getUserLetter():
     Obtains and sets the user's chosen letter (X or O) and the AI's
     """
     
-    inputLet = input("Please enter your chosen letter (X or O): ")
-
     # Set userLet to the user's letter and AILet to the AI's
-    if inputLet.lower() == "x" or inputLet.lower() == "'x'":
-        userLet = "X" 
-        AILet = "O"
+    letAccepted = False
 
-    if inputLet.lower() == "o" or inputLet.lower() == "'o'":
-        userLet = "O"
-        AILet = "X"
+    while not letAccepted:
+        inputLet = input("Please enter your chosen letter (X or O): ")
+        if inputLet.lower() == "x" or inputLet.lower() == "'x'":
+            userLet = "X" 
+            AILet = "O"
+            letAccepted = True
+
+        if inputLet.lower() == "o" or inputLet.lower() == "'o'":
+            userLet = "O"
+            AILet = "X"
+            letAccepted = True
 
     return userLet, AILet
 
@@ -75,11 +82,11 @@ def main():
     gameEnd = False
     plays = 1
     while not gameEnd:
-        loc = int(input("Enter a location number: "))
         if plays % 2 == 0:
-            gameBoard.updateBoard(loc, AILet)
+            gameBoard.updateBoard(AILet)
         else:
-            gameBoard.updateBoard(loc, userLet)
+            gameBoard.updateBoard(userLet)
+            
         if plays >= 5:
             win = gameBoard.checkWin(userLet)
             if win == userLet:
