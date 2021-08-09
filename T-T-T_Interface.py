@@ -1,5 +1,5 @@
-#from AIFunctions import AI
-
+import AIFunctions 
+import random
 
 class Board():
     def __init__(self):
@@ -7,7 +7,7 @@ class Board():
 
     def checkWin(self, Tlet):
         """
-        Checks if either the user or AI won
+        Checks if a win condition was reached
 
         Parameters:
             Tlet (str) : X or O
@@ -29,37 +29,62 @@ class Board():
         [({6}),({7}),({8})]
         """.format(*self.boardArr))
 
-    def twoPlayerUpdateBoard(self, Tlet, Ordering):
+    def addPoint(self, Tlet, Tloc):
+        """
+        Adds the specfied point to the board in the specified location
+
+        Parameters:
+            Tlet (str): X or O that will be placed on the board
+            Tloc (str): Number (0 through 8) which represents where Tlet will be placed on the board
+        
+        Returns True if point was succesfully added and False if not
+        """
+        if Tloc.isdigit():
+            if int(Tloc) in range(9):
+                if str(self.boardArr[int(Tloc)]).isdigit():
+                    self.boardArr[int(Tloc)] = Tlet
+                    self.printBoard()
+                    return True
+        return False
+
+    def updateBoard(self, Tlet, Ordering, numMoves):
         """
         Updates the T-T-T board and displays it in the terminal
 
         Parameters:
             Tlet (str) : X or O that will be placed on the board
             Ordering (str) : 1st or 2nd which states which user (or AI) the letter is associated with
-        
-
+            numMoves (int) : Number of moves made so far
         """
         locAccepted = False
         while not locAccepted:
             if Ordering == "P1":
                 loc = input("Player 1, please enter a location number: ")
-                if loc.isdigit():
-                    if int(loc) in range(9):
-                        if str(self.boardArr[int(loc)]).isdigit():
-                            self.boardArr[int(loc)] = Tlet
-                            self.printBoard()
-                            locAccepted = True
-            
-            else:
+                locAccepted = self.addPoint(Tlet, loc)
+
+            elif Ordering == "P2":
                 loc = input("Player 2, please enter a location number: ")
-                if loc.isdigit():
-                    if int(loc) in range(9):
-                        if str(self.boardArr[int(loc)]).isdigit():
-                            self.boardArr[int(loc)] = Tlet
-                            self.printBoard()
-                            locAccepted = True
+                locAccepted = self.addPoint(Tlet, loc)
 
+            elif Ordering == "Player":
+                loc = input("Please enter player's location number: ")
+                locAccepted = self.addPoint(Tlet, loc)
 
+            elif Ordering == "AI":
+                print("AI's Move: ")
+                # The following call finds the best move for the AI and adds it to the board
+                self.boardArr = AIFunctions.AIAddPoint(self.boardArr, Tlet, numMoves)
+                self.printBoard()
+                locAccepted = True
+
+            elif Ordering == "AI First":
+                cornerList = [0, 2, 6, 8]
+                loc = random.choice(cornerList)
+                locAccepted = self.addPoint(Tlet, loc)
+            
+            else: 
+                pass
+                
 
 def getUserLetter():
     """
@@ -114,9 +139,9 @@ def twoPlayerMode():
     plays = 1
     while not gameEnd:
         if plays % 2 == 0:
-            gameBoard.twoPlayerUpdateBoard('O', second)
+            gameBoard.updateBoard('O', second)
         else:
-            gameBoard.twoPlayerUpdateBoard('X', first)
+            gameBoard.updateBoard('X', first)
             
         if plays >= 5:
             if plays % 2 == 0:
@@ -146,7 +171,56 @@ def twoPlayerMode():
         plays += 1
 
 def AIMode():
-    pass
+    gameBoard = Board() 
+    playerLet, AILet = getUserLetter()
+    if playerLet == "X":
+        first = "Player"
+        second = "AI"
+    else: 
+        first = "AI"
+        second = "Player"
+    gameBoard.printBoard()
+
+    gameEnd = False
+    plays = 1
+    # If first move is AI, set first move to a corner tile (which is the best first move)
+    if first == "AI":
+        gameBoard.updateBoard('X', "AI First")
+        plays += 1
+    
+    while not gameEnd:
+        if plays % 2 == 0:
+            gameBoard.updateBoard('O', second)
+        else:
+            gameBoard.updateBoard('X', first)
+            
+        if plays >= 5:
+            if plays % 2 == 0:
+                win = gameBoard.checkWin('O')
+                if win == True:
+                    gameEnd = True
+                    if second == "Player":
+                        print("Player wins!")
+                    else: 
+                        print("AI wins!")
+                    return
+    
+            else: 
+                win = gameBoard.checkWin('X')
+                if win == True:
+                    gameEnd = True
+                    if first == "Player":
+                        print("Player wins!")
+                    else: 
+                        print("AI wins!")
+                    return
+        
+        if plays == 9:
+            gameEnd = True
+            print("It's a tie!")
+            return
+        plays += 1
+
 
 def main():
     """
