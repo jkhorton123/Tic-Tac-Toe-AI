@@ -56,7 +56,7 @@ def AIAddPoint(boardArr, let):
         moves = moveTree(initState)
         buildMoveTree(moves)
     # Pass built-out moves tree with values indicating loss, tie, or win to minimax
-    findBestMove = minimax(moveWeights)
+    findBestMove = minimax(moves)
     #CHANGE ABOVE LINE AND IMPLEMENT FUNCTION THAT CALLS MINIMAX AND TRAVERSES DOWN TREE EACH TIME A MOVE IS MADE BY AI OR PLAYER
     return boardArr
 
@@ -117,10 +117,3 @@ def buildMoveTree(moves):
                     
         # Recursively build out the tree with possible board states
         buildMoveTree(moves.root.children)
-
-
-
-
-
-
-
