@@ -146,7 +146,7 @@ def twoPlayerMode():
         if plays >= 5:
             if plays % 2 == 0:
                 win = gameBoard.checkWin('O')
-                if win == True:
+                if win:
                     gameEnd = True
                     if second == "P1":
                         print("Player 1 wins!")
@@ -156,7 +156,7 @@ def twoPlayerMode():
     
             else: 
                 win = gameBoard.checkWin('X')
-                if win == True:
+                if win:
                     gameEnd = True
                     if first == "P1":
                         print("Player 1 wins!")
@@ -165,8 +165,15 @@ def twoPlayerMode():
                     return
         
         if plays == 9:
+            win = gameBoard.checkWin('X') # X always starts so the 9th move will always be X
             gameEnd = True
-            print("It's a tie!")
+            if win:
+                if first == "P1":
+                    print("Player 1 wins!")
+                else:
+                    print("Player 2 wins!")
+            else:
+                print("It's a tie!")
             return
         plays += 1
 
