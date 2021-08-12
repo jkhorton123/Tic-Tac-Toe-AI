@@ -1,16 +1,12 @@
 # IF X IS AI, ROOT NODE SHOULD BE SET TO MIDDLE
-class Node():
+class moveNode():
     def __init__(self, state, val):
         self.weight = val
         self.state = state
         self.children = []
 
-class moveTree():
-    def __init__(self, state, val):
-        self.root = Node(state, val)
-
     def addChild(self, child):
-        self.root.children.append(child)
+        self.children.append(child)
 
     
 class AI():
@@ -53,7 +49,7 @@ def AIAddPoint(boardArr, let):
     AILet = let
     if firstMove:
         initState = convertLetPos(boardArr)
-        moves = moveTree(initState)
+        moves = moveNode(initState)
         buildMoveTree(moves)
     # Pass built-out moves tree with values indicating loss, tie, or win to minimax
     findBestMove = minimax(moves)
@@ -86,34 +82,47 @@ def buildMoveTree(moves):
 
         Parameters:
             
-            AIMove (bool) : True if it is the AI's move and False if it is the player's
+            moves (list) : List containing moveNodes 
 
         Returns:
             moveWeights (tree) : Tree containing each possible state of the board and the associated win weight
         """
-        currentMoves = moves.root.state
-        if len(currentMoves[0]) != 9:
-            for move in currentMoves:
-                currentWeight = move.root.weight
-                if currentWeight != -1 and currentWeight != 1:
-                    for i in range(9):
-                        if not i in move:
-                            newMove = move.append(i) # Check if this mutates move
-                            if len(newMove) < 5 or len(newMove) == 9:
-                                weight = 0
-                            else:
-                                weight, win = checkWin(newMove)
-                                if win != "None":
-                                    if win == AILet:
-                                        weight = 1
-                                    else:
-                                        weight = -1
-                            newNode = moveTree(newMove, weight)
-                            moves.addChild(newNode)
+        AILet = 'X' # DELETE THIS LATER
+        if len(moves) == 0: # Returns if no child nodes were added
+            return
+        for Node in moves:
+            currentState = Node.state # Current board state
+            currentWeight = Node.weight # Win weight of sequence 
+            if len(currentState) == 9: # If 9 moves have been made, the game has ended
+                continue
+            elif currentWeight != 0: # Check that sequence is not win or loss
+                continue
+            else:
+                for i in range(9):
+                    if not i in currentState:
+                        newMove = currentState.copy()
+                        newMove.append(i) # Find possible next move
+                        if len(newMove) < 5: # A win or loss is only possible after 5 moves
+                            weight = 0
+                        else:
+                            weight, win = checkWin(newMove)
+                            #print(win, weight)
+                            if win != "None":
+                                if win == AILet:
+                                    weight = 1 # AI is maximizer
+                                else:
+                                    weight = -1 # Player is minimizer
+                        newNode = moveNode(newMove, weight)
+                        Node.addChild(newNode) # Add new moveTree containing possible next move as a child of the current node
 
-                        # If at least 5 moves have been played, check if it is a win, add 0 to children if no win or tie, -1 if loss, 1 if win
-                        # If 9 moves are played, then it is a tie (0)
-                
+                    # If at least 5 moves have been played, check if it is a win, add 0 to children if no win or tie, -1 if loss, 1 if win
+                    # If 9 moves are played, then it is a tie (0)
                     
-        # Recursively build out the tree with possible board states
-        buildMoveTree(moves.root.children)
+                
+            # Recursively build out the tree with possible board states
+            buildMoveTree(Node.children)
+
+moves = [moveNode([6], 0)]
+buildMoveTree(moves)
+#print(moves[0].children[6].children[2].children[0].children[3].children[0].children[0].children[0].weight)
+#print(moves[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].state)
