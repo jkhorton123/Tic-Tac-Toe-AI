@@ -39,7 +39,7 @@ class Board():
         
         Returns True if point was succesfully added and False if not
         """
-        if Tloc.isdigit():
+        if str(Tloc).isdigit():
             if int(Tloc) in range(9):
                 if str(self.boardArr[int(Tloc)]).isdigit():
                     self.boardArr[int(Tloc)] = Tlet
@@ -47,7 +47,7 @@ class Board():
                     return True
         return False
 
-    def updateBoard(self, Tlet, Ordering, numMoves):
+    def updateBoard(self, Tlet, Ordering):
         """
         Updates the T-T-T board and displays it in the terminal
 
@@ -73,7 +73,7 @@ class Board():
             elif Ordering == "AI":
                 print("AI's Move: ")
                 # The following call finds the best move for the AI and adds it to the board
-                self.boardArr = AIFunctions.AIAddPoint(self.boardArr, Tlet, numMoves)
+                self.boardArr = AIFunctions.AIAddPoint(self.boardArr, Tlet)
                 self.printBoard()
                 locAccepted = True
 
