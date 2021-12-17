@@ -3,7 +3,6 @@ corners = [0, 2, 6, 8]
 edges = [1, 3, 5, 7]
 middle = 4
 winWeight = 100000
-# IF X IS AI, ROOT NODE SHOULD BE SET TO MIDDLE
 class moveNode():
     def __init__(self, state, val):
         self.weight = val
@@ -17,43 +16,6 @@ class moveNode():
 class AI():
     def __init__(self, val):
         self.let = val
-        """
-        self.winWeightsX = {
-            # C: Corner, E: Edge, M: Middle
-            #checkWin checks for win, assigning a win weight of 10000
-            # 2-in-a-row for X
-            'XC XE ~C': 500, 
-            'XC XC ~M': 500,
-            'XE XE ~M': 500,
-            'XE XM ~E': 500,
-            'XC XM ~C': 500,
-            # AI stopping opponent win
-
-            # corners
-            'XC ~C ~E': 50,
-            'XC ~C ~M': 50,
-            #center
-            'XM ~C ~C': 25
-            }
-
-        self.winWeightsO = {
-            # C: Corner, E: Edge, M: Middle
-            #checkWin checks for win, assigning a win weight of 10000
-            # 2-in-a-row for X
-            'OC OE ~C': 500, 
-            'OC OC ~M': 500,
-            'OE OE ~M': 500,
-            'OE OM ~E': 500,
-            'OC OM ~C': 500,
-            # AI stopping opponent win
-
-            # corners
-            'OC ~C ~E': 50,
-            'OC ~C ~M': 50,
-            #center
-            'OM ~C ~C': 25
-            }
-            """
         
 def convertLetPos(boardArr):
     """
@@ -82,17 +44,7 @@ def convertLetPos(boardArr):
                 break
 
     return state
-"""
-def convertToBoardArr(move):
-    convertedBoardArr = [x for x in range(9)]
-    for i in range(len(move)): 
-        if i % 2 == 0:
-            convertedBoardArr[move[i]] = 'X'
-        else:
-            convertedBoardArr[move[i]] = 'O'
 
-    return convertedBoardArr
-"""
 def minimax(root, depth, alpha, beta, AIMove, val):
     """
     
@@ -118,35 +70,7 @@ def minimax(root, depth, alpha, beta, AIMove, val):
             
     #print(val)
     return val
-    
-"""
 
-def winProbability(node):
-    sumList = []
-    maxIndex = -1
-    maxSum = float('-inf')
-    for i in range(len(node.children)):
-        # For each child node, find the sum of leaves from that node and append to sumList, max is optimal move for AI
-        leafSum = 0
-        leafSum = addLeaves([node.children[i]], leafSum)
-        sumList.append(leafSum)
-
-        if sumList[i] > maxSum:
-            maxSum = sumList[i]
-            maxIndex = i
-    print(sumList)
-    # nextMove = node.children[maxIndex].state[-1] # Int (next space filled)
-    return node.children[maxIndex] # Returns next node
-
-def addLeaves(nodes, leafSum):
-    if len(nodes) == 0:
-        return 
-    for Node in nodes:
-        if len(Node.children) == 0:
-            leafSum += Node.weight
-        addLeaves(Node.children, leafSum)
-    return leafSum
-"""
 def AIAddPoint(boardArr, let):
     """
     Finds the best move for the AI and adds it to the board
@@ -159,33 +83,18 @@ def AIAddPoint(boardArr, let):
     global AILet 
     global nextNode
     AILet = let
-    """
-    if not (AILet in boardArr) : # First move for AI
-        initState = convertLetPos(boardArr)
-        newNode = moveNode([initState], 0)
-        moves = moveNode([newNode], 0)
-        buildMoveTree([moves])
-    """
-        #print("moves: ", moves.state)
-    # Pass built-out moves tree with values indicating loss, tie, or win to minimax
-    #findBestMove = minimax(moves)
    
     initState = convertLetPos(boardArr)
-    #print(initState)
     moves = moveNode(initState, 0)
-    buildMoveTree([moves])
-    #print(moves.state[0].children[0].weight)
+    buildMoveTree([moves], AILet)
     maxWeight = float('-inf')
     nextMove = -1
     for Node in moves.children:
         weight = minimax([Node], 0, 0, 0, True, 0)
-        #print("result: ", weight)
         if weight > maxWeight:
             maxWeight = weight
             nextMove = Node.state[-1]
-    #nextNode = winProbability(nextNode)
-    #CHANGE ABOVE LINE AND IMPLEMENT FUNCTION THAT CALLS MINIMAX AND TRAVERSES DOWN TREE EACH TIME A MOVE IS MADE BY AI OR PLAYER
-    boardArr[nextMove] = 'X'
+    boardArr[nextMove] = AILet
     return boardArr
 
 def checkWin(move):
@@ -200,80 +109,28 @@ def checkWin(move):
         """
         xCases = move[::2]
         oCases = move[1::2]
-        
-        #print(xCases)
-        #print(oCases)
         for case in winCases:
-                #print(case, xCases)
                 if set(case).issubset(xCases):
-                    return 'X' #assumming AI is X 
+                    return 'X' 
                     
                 elif set(case).issubset(oCases):
                     return 'O'
         return 'None'
 
-"""
-def scanMove(move, let):
-  
-    #Scans the 8 possible lines in the tic-tac-toe array (horizontal, vertical, and diagonals), finds the weight of each of the lines, and adds the weights to return the weight for the move
-  
-    weightSum = 0
-    movePos = []
-    boardArr = convertToBoardArr(move)
 
-    for line in winCases:
-        movePos.clear()
-        for i in range(3):
-            boardPos = line[i]
-            Pos = boardArr[boardPos]
-            # Check what letter is on the board (no letter (-), X, or O)
-            if Pos != 'X' and Pos != 'O':
-                movePos.append('~')
-            elif Pos == 'X':
-                movePos.append('X')
-            else:
-                movePos.append('O')
-
-            # Check if the letter is at a corner, edge, or middle position
-            if boardPos in corners:
-                movePos[i] = movePos[i] + 'C'
-            elif boardPos in edges: 
-                movePos[i] = movePos[i] + 'E'
-            elif boardPos == middle:
-                movePos[i] = movePos[i] + 'M'
-        
-        movePos = sorted(movePos)
-        lineEncoding = ' '.join(movePos)
-        print(lineEncoding)
-        if let == 'X':
-            # Assuming AILet is X
-            if lineEncoding in myAI.winWeightsX.keys():
-                weightSum += myAI.winWeightsX[lineEncoding] 
-            elif lineEncoding in myAI.winWeightsO.keys():
-                weightSum -= myAI.winWeightsO[lineEncoding]
-        else:
-            # Assuming AILet is X
-            if lineEncoding in myAI.winWeightsX.keys():
-                weightSum -= myAI.winWeightsX[lineEncoding] 
-            elif lineEncoding in myAI.winWeightsO.keys():
-                weightSum += myAI.winWeightsO[lineEncoding]
-    print(weightSum)
-    return weightSum
-
-"""
-
-def buildMoveTree(moves):
+def buildMoveTree(moves, AILet):
         """
         Build a tree containing all possible moves after the given board state and the relative win weight of each board state (-1: loss, 0: tie or no outcome, 1: win)
 
         Parameters:
             
             moves (list) : List containing moveNodes 
+            AILet (String) : The letter for the AI ("X" or "O")
 
         Returns:
             moveWeights (tree) : Tree containing each possible state of the board and the associated win weight
         """
-        AILet = 'X' # DELETE THIS LATER
+        AILet = AILet 
         if len(moves) == 0: # Returns if no child nodes were added
             return
         for Node in moves:
@@ -305,16 +162,7 @@ def buildMoveTree(moves):
                     
                 
             # Recursively build out the tree with possible board states
-            buildMoveTree(Node.children)
+            buildMoveTree(Node.children, AILet)
             
 
-#initNode = moveNode([6], 0)
-#moves = [moveNode([initNode], 0)]
-#buildMoveTree(moves)
-#print(moves[0].children[6].children[2].children[0].children[3].children[0].children[2].weight)
-#print(moves[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].state)
-#boardArr = ['O', 'X', 'O', 'X', 4, 'X', 'X', 'O', 'O']
-#boardArr = ['X', 'O', 2, 'X', 'X', 'O', 'O', 7, 8]
-
-#print("win: ", AIAddPoint(boardArr, 'X'))
 

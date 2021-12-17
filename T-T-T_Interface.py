@@ -69,6 +69,11 @@ class Board():
             elif Ordering == "Player":
                 loc = input("Please enter player's location number: ")
                 locAccepted = self.addPoint(Tlet, loc)
+            
+            elif Ordering == "Player First":
+                self.printBoard()
+                loc = input("Please enter player's location number: ")
+                locAccepted = self.addPoint(Tlet, loc)
 
             elif Ordering == "AI":
                 print("AI's Move: ")
@@ -133,6 +138,7 @@ def twoPlayerMode():
     else: 
         first = "P2"
         second = "P1"
+    
     gameBoard.printBoard()
 
     gameEnd = False
@@ -186,13 +192,17 @@ def AIMode():
     else: 
         first = "AI"
         second = "Player"
-    gameBoard.printBoard()
 
     gameEnd = False
     plays = 1
     # If first move is AI, set first move to a corner tile (which is the best first move)
     if first == "AI":
+        print("AI's Move:")
         gameBoard.updateBoard('X', "AI First")
+        plays += 1
+    
+    elif first == "Player":
+        gameBoard.updateBoard('X', "Player First")
         plays += 1
     
     while not gameEnd:
@@ -241,7 +251,6 @@ def main():
     else: 
         twoPlayerMode()
 
-   #userLet, AILet = getUserLetter()
 
     
 
