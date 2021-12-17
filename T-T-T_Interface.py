@@ -45,6 +45,12 @@ class Board():
                     self.boardArr[int(Tloc)] = Tlet
                     self.printBoard()
                     return True
+                else: 
+                    print("Location has already been selected")
+            else: 
+                print("Location must be an integer between 0 and 8")
+        else: 
+            print("Location must be an integer between 0 and 8")
         return False
 
     def updateBoard(self, Tlet, Ordering):
@@ -59,20 +65,20 @@ class Board():
         locAccepted = False
         while not locAccepted:
             if Ordering == "P1":
-                loc = input("Player 1, please enter a location number: ")
+                loc = input("Player 1, please enter your location number: ")
                 locAccepted = self.addPoint(Tlet, loc)
 
             elif Ordering == "P2":
-                loc = input("Player 2, please enter a location number: ")
+                loc = input("Player 2, please enter your location number: ")
                 locAccepted = self.addPoint(Tlet, loc)
 
             elif Ordering == "Player":
-                loc = input("Please enter player's location number: ")
+                loc = input("Please enter your location number: ")
                 locAccepted = self.addPoint(Tlet, loc)
             
             elif Ordering == "Player First":
                 self.printBoard()
-                loc = input("Please enter player's location number: ")
+                loc = input("Please enter your location number: ")
                 locAccepted = self.addPoint(Tlet, loc)
 
             elif Ordering == "AI":
@@ -107,11 +113,13 @@ def getUserLetter():
             otherLet = 'O'
             letAccepted = True
 
-        if inputLet.lower() == "o" or inputLet.lower() == "'o'":
+        elif inputLet.lower() == "o" or inputLet.lower() == "'o'":
             P1Let = 'O'
             otherLet = 'X'
             letAccepted = True
 
+        else:
+            print("Input is not valid")
     return P1Let, otherLet
 
 def checkMode():
@@ -121,12 +129,9 @@ def checkMode():
 
     modeMsg = "Enter 1 for User Vs AI Mode and Enter 2 for 2-Player Mode: "
     mode = input(modeMsg)
-    while not mode.isdigit():
-        mode = input(modeMsg)
+    while not mode == '1' and not mode == '2':
+        mode = input("Input was neither 1 nor 2. Please enter a valid input: ")
     modeNum = int(mode)
-    while not modeNum == 1 and not modeNum == 2:
-        mode = input(modeMsg)
-        modeNum = int(mode)
     return modeNum
 
 def twoPlayerMode():
